@@ -1,57 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
-import { accounts } from "./accounts.js";
+import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import { Field } from "./FieldRenderer/index.js";
 import { submit } from "./submit.js";
+import { fieldConfig } from "./config.js";
+import { treeMap } from "./utils.js";
 
 /* 
 Possible Future Features: 
-- Ability to edit accounts list
 - Send to Ministry Leader for approval when total > $250
 
 */
-
-const dollars = (val) => "$" + Number(val).toLocaleString();
-
-const fields = [
-  { name: "Requestor Name", type: "text" },
-  { name: "Make Check Payable To", type: "text" },
-  {
-    name: "list",
-    type: "rows",
-    defaultValue: [{}],
-    elements: [
-      { name: "Account", cols: 4, type: "select", options: accounts },
-      { name: "Explanation", cols: 5, props: { multiline: true } },
-      {
-        name: "Dollar Amount",
-        cols: 2,
-        props: { type: "number" },
-        formatter: dollars,
-      },
-    ],
-  },
-  {
-    name: "Total",
-    type: "calculated",
-    props: { disabled: true },
-    formatter: dollars,
-  },
-  {
-    name: "Check Delivery",
-    type: "select",
-    options: [
-      "Mail Check",
-      "Give Check to Requestor",
-      "Place Check in Requestor's Folder",
-    ],
-  },
-  {
-    name: "Address",
-    type: "text",
-    showWhen: (s) => s["Check Delivery"] === "Mail Check",
-  },
-];
 
 const setTotal = (state, setState) => {
   const total = state.list.reduce(
@@ -63,14 +21,42 @@ const setTotal = (state, setState) => {
   }, [total]);
 };
 
-export default function App() {
-  const [state, setState] = useState(
-    fields.reduce((r, f) => ({ ...r, [f.name]: f.defaultValue }), {})
+const setAccounts = async (setFields, setLoading) => {
+  const response = await fetch(
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSKMEpvYGCrwfob-IwuiYWb-im8oTCtYxtj9Uet9rc3jKzSU65t7UU1ssxeY_JcrmSQhDQ_NdnKNE7A/pub?output=tsv"
   );
+  const text = await response.text();
+  const accounts = text?.split("\n");
+  setFields((fields) =>
+    treeMap(
+      (n) => (n?.name === "Account" ? { ...n, options: accounts } : n),
+      fields
+    )
+  );
+  setLoading(false);
+};
+
+export default function App() {
+  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(
+    fieldConfig.reduce((res, { type, name }) => {
+      if (type === "rows") res[name] = [{}];
+      return res;
+    }, {})
+  );
+  const [fields, setFields] = useState(fieldConfig);
+
+  useEffect(() => {
+    setAccounts(setFields, setLoading);
+  }, []);
 
   setTotal(state, setState);
 
-  return (
+  return loading ? (
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <CircularProgress />
+    </Box>
+  ) : (
     <>
       <Typography p={1} variant="h4">
         Check Request Form

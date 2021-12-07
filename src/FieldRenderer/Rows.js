@@ -1,18 +1,7 @@
 import React from "react";
 import { Button, Grid } from "@mui/material";
 import { Field } from ".";
-
-const adjust = (index, func, arr) => {
-  const copy = [...arr];
-  copy[index] = func(copy[index]);
-  return copy;
-};
-
-const remove = (index, arr) => {
-  const copy = [...arr];
-  copy.splice(index, 1);
-  return copy;
-};
+import { adjust, remove } from "../utils";
 
 export const RowsRender = ({ elements, fieldProps: { value, onChange } }) => {
   const addRow = () => onChange({ target: { value: [...value, {}] } });
@@ -29,7 +18,7 @@ export const RowsRender = ({ elements, fieldProps: { value, onChange } }) => {
           return (
             <Grid container item key={i} spacing={1}>
               {elements.map((field) => (
-                <Grid key={field.name} item xs={field.cols}>
+                <Grid key={field.name} item xs={field.columns}>
                   <Field field={field} state={row} setState={setRow} />
                 </Grid>
               ))}
