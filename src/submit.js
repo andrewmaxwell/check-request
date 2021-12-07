@@ -46,6 +46,6 @@ export const submit = (fields, state, setState) => {
     `Date: ${date}\r\n${fieldStr}\r\n\r\nREMINDER: Attach relevant files.`
   );
   window.open(
-    `mailto:checkrequest@chathambiblechurch.org?subject=Check Request&body=${body}`
+    `mailto:checkrequest@chathambiblechurch.org?cc=chathamit@chathambiblechurch.org&subject=Check Request&body=${body}`
   );
 };
