@@ -1,45 +1,89 @@
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { accounts } from "./accounts.js";
-import { useState } from "react";
-import { RenderFields } from "./RenderFields.js";
+import { Field } from "./FieldRenderer/index.js";
 import { submit } from "./submit.js";
 
 /* 
 Possible Future Features: 
+- Ability to edit accounts list
 - Send to Ministry Leader for approval when total > $250
-- Multiple accounts in a single request
 
 */
 
+const dollars = (val) => "$" + Number(val).toLocaleString();
+
 const fields = [
-  { name: "Requestor Name" },
-  { name: "Make Check Payable To" },
-  { name: "Account", options: accounts },
-  { name: "Explanation", props: { multiline: true } },
-  { name: "Dollar Amount", props: { type: "number" } },
+  { name: "Requestor Name", type: "text" },
+  { name: "Make Check Payable To", type: "text" },
+  {
+    name: "list",
+    type: "rows",
+    defaultValue: [{}],
+    elements: [
+      { name: "Account", cols: 4, type: "select", options: accounts },
+      { name: "Explanation", cols: 5, props: { multiline: true } },
+      {
+        name: "Dollar Amount",
+        cols: 2,
+        props: { type: "number" },
+        formatter: dollars,
+      },
+    ],
+  },
+  {
+    name: "Total",
+    type: "calculated",
+    props: { disabled: true },
+    formatter: dollars,
+  },
   {
     name: "Check Delivery",
+    type: "select",
     options: [
       "Mail Check",
       "Give Check to Requestor",
-      "Place Check in Requestor's Folder"
-    ]
+      "Place Check in Requestor's Folder",
+    ],
   },
-  { name: "Address", showWhen: (s) => s["Check Delivery"] === "Mail Check" }
+  {
+    name: "Address",
+    type: "text",
+    showWhen: (s) => s["Check Delivery"] === "Mail Check",
+  },
 ];
 
+const setTotal = (state, setState) => {
+  const total = state.list.reduce(
+    (sum, row) => sum + Number(row["Dollar Amount"] ?? 0),
+    0
+  );
+  useEffect(() => {
+    setState((s) => ({ ...s, Total: total }));
+  }, [total]);
+};
+
 export default function App() {
-  const [state, setState] = useState({});
+  const [state, setState] = useState(
+    fields.reduce((r, f) => ({ ...r, [f.name]: f.defaultValue }), {})
+  );
+
+  setTotal(state, setState);
+
   return (
     <>
       <Typography p={1} variant="h4">
         Check Request Form
       </Typography>
 
-      <RenderFields {...{ fields, state, setState }} />
+      {fields.map((field) => (
+        <Box key={field.name} p={1}>
+          <Field {...{ field, state, setState }} />
+        </Box>
+      ))}
 
       <Typography p={1}>
-        Pressing "Submit" will create an email ready to be sent.
+        Pressing &quot;Submit&quot; will create an email ready to be sent.
       </Typography>
 
       <Typography p={1}>
@@ -68,9 +112,8 @@ export default function App() {
           right: 2,
           bottom: 2,
           font: "12px sans-serif",
-          color: "red"
         }}
-        href="mailto:me@andrewmaxwell.dev?subject=Check Request Bug Report"
+        href="mailto:chathamit@chathambiblechurch.org?subject=Check Request Bug Report"
       >
         Report a Problem
       </a>
