@@ -18,11 +18,11 @@ export const RowsRender = ({ elements, fieldProps: { value, onChange } }) => {
           return (
             <Grid container item key={i} spacing={1}>
               {elements.map((field) => (
-                <Grid key={field.name} item xs={field.columns}>
+                <Grid key={field.name} item xs={12} sm={field.columns}>
                   <Field field={field} state={row} setState={setRow} />
                 </Grid>
               ))}
-              <Grid item xs={1}>
+              <Grid item sm={1}>
                 {i ? (
                   <Button
                     sx={{ width: "100%", height: "100%" }}
