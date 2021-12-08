@@ -31,6 +31,7 @@ module.exports = {
     "no-use-before-define": "warn",
     "react/display-name": "off",
     "no-prototype-builtins": "off",
+    "no-unused-vars": "warn",
   },
   settings: { react: { version: "detect" } },
 };

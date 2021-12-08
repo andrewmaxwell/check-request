@@ -1,51 +1,45 @@
-const isVisible = (showWhen, state) => !showWhen || showWhen(state);
+import { objMap } from "./utils";
 
-const isInvalid = ({ name, showWhen, elements }, state) =>
-  isVisible(showWhen, state) &&
-  (!state[name] ||
-    (elements &&
-      state[name].some((row) => elements.some((el) => isInvalid(el, row)))));
+const isVisible = ({ hide }) => !hide;
 
-const hasValidationErrors = (state, fields) =>
-  fields.some((f) => isInvalid(f, state));
+const isEmpty = (val = "") => !String(val).trim().length;
 
-const addValidationErrors = (state, fields) =>
-  fields.reduce((state, field) => {
-    if (field.elements) {
-      const newRows = state[field.name]?.map((row) =>
-        addValidationErrors(row, field.elements)
-      );
-      return { ...state, [field.name]: newRows };
-    }
-    return {
-      ...state,
-      [field.name + "Error"]: isInvalid(field, state) && "Required",
-    };
-  }, state);
+const isInvalid = (node) =>
+  isVisible(node) &&
+  (isEmpty(node.value) ||
+    (Array.isArray(node.value) &&
+      node.value.some((row) => Object.values(row).some(isInvalid))));
 
-const fieldsToStr = (fields, state) =>
-  fields
-    .filter((field) => isVisible(field.showWhen, state))
-    .map(({ elements, name, formatter = (x) => x }) =>
-      elements
-        ? state[name]
-            .map((row) => `\r\n${fieldsToStr(elements, row)}\r\n`)
-            .join("")
-        : `${name}: ${(formatter || ((x) => x))(state[name] || "")}`
+const addValidationErrors = (arr) =>
+  objMap(
+    (node) =>
+      Array.isArray(node.value)
+        ? { ...node, value: node.value.map(addValidationErrors) }
+        : { ...node, error: isInvalid(node) && "Required" },
+    arr
+  );
+
+const fieldsToStr = (arr) =>
+  Object.values(arr)
+    .filter(isVisible)
+    .map(({ label, value, formatter = (x) => x }) =>
+      Array.isArray(value)
+        ? `\r\n${value.map((row) => fieldsToStr(row)).join("\r\n\r\n")}\r\n`
+        : `${label}: ${formatter(value)}`
     )
     .join("\r\n");
 
-export const submit = (fields, state, setState) => {
-  if (hasValidationErrors(state, fields)) {
-    setState((state) => addValidationErrors(state, fields));
+export const submit = (state, setState) => {
+  if (Object.values(state).some(isInvalid)) {
+    setState(addValidationErrors);
     return;
   }
   const date = new Date().toLocaleString();
-  const fieldStr = fieldsToStr(fields, state);
+  const fieldStr = fieldsToStr(state);
   const body = encodeURIComponent(
     `Date: ${date}\r\n${fieldStr}\r\n\r\nREMINDER: Attach relevant files.`
   );
   window.open(
-    `mailto:checkrequest@chathambiblechurch.org?cc=chathamit@chathambiblechurch.org&subject=Check Request&body=${body}`
+    `mailto:chatham.ap@gmail.com?cc=chathamit@chathambiblechurch.org&subject=Check Request&body=${body}`
   );
 };

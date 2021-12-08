@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, CircularProgress } from "@mui/material";
-import { Field } from "./FieldRenderer/index.js";
+import { RenderFields } from "./RenderFields.js";
 import { submit } from "./submit.js";
-import { fieldConfig } from "./config.js";
-import { treeMap } from "./utils.js";
+import { loadState } from "./loadState.js";
+import { runUpdaters } from "./runUpdaters.js";
 
 /* 
 Possible Future Features: 
@@ -11,62 +11,30 @@ Possible Future Features:
 
 */
 
-const setTotal = (state, setState) => {
-  const total = state.list.reduce(
-    (sum, row) => sum + Number(row["Dollar Amount"] ?? 0),
-    0
-  );
-  useEffect(() => {
-    setState((s) => ({ ...s, Total: total }));
-  }, [total]);
-};
-
-const setAccounts = async (setFields, setLoading) => {
-  const response = await fetch(
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSKMEpvYGCrwfob-IwuiYWb-im8oTCtYxtj9Uet9rc3jKzSU65t7UU1ssxeY_JcrmSQhDQ_NdnKNE7A/pub?output=tsv"
-  );
-  const text = await response.text();
-  const accounts = text?.split("\n");
-  setFields((fields) =>
-    treeMap(
-      (n) => (n?.name === "Account" ? { ...n, options: accounts } : n),
-      fields
-    )
-  );
-  setLoading(false);
-};
-
 export default function App() {
-  const [loading, setLoading] = useState(true);
-  const [state, setState] = useState(
-    fieldConfig.reduce((res, { type, name }) => {
-      if (type === "rows") res[name] = [{}];
-      return res;
-    }, {})
-  );
-  const [fields, setFields] = useState(fieldConfig);
+  const [state, setState] = useState();
 
   useEffect(() => {
-    setAccounts(setFields, setLoading);
+    loadState().then(setState);
   }, []);
 
-  setTotal(state, setState);
+  if (!state) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", padding: 20 }}>
+        <CircularProgress size={100} />
+      </Box>
+    );
+  }
 
-  return loading ? (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
-      <CircularProgress />
-    </Box>
-  ) : (
+  runUpdaters(state, setState);
+
+  return (
     <>
       <Typography p={1} variant="h4">
         Check Request Form
       </Typography>
 
-      {fields.map((field) => (
-        <Box key={field.name} p={1}>
-          <Field {...{ field, state, setState }} />
-        </Box>
-      ))}
+      <RenderFields fields={state} setState={setState} />
 
       <Typography p={1}>
         Pressing &quot;Submit&quot; will create an email ready to be sent.
@@ -80,10 +48,7 @@ export default function App() {
       </Typography>
 
       <Box p={1}>
-        <Button
-          variant="contained"
-          onClick={() => submit(fields, state, setState)}
-        >
+        <Button variant="contained" onClick={() => submit(state, setState)}>
           Submit
         </Button>
       </Box>
