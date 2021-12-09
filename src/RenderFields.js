@@ -42,7 +42,7 @@ const fieldRenderers = {
         <Grid container item key={i} spacing={1}>
           <RenderFields
             fields={row}
-            setState={(updateRow) => {
+            onChange={(updateRow) => {
               onChange({ target: { value: adjust(i, updateRow, value) } });
             }}
           >
@@ -83,16 +83,16 @@ const Field = (props) => {
   return <Input {...props} />;
 };
 
-export const RenderFields = ({ fields, setState, children }) => (
+export const RenderFields = ({ fields, onChange, children }) => (
   <Grid container>
     {Object.entries(fields).map(([key, field]) => (
       <Grid item key={key} p={1} xs={12} sm={field.columns}>
         <Field
           {...field}
           onChange={(e) => {
-            setState((s) => ({
+            onChange((s) => ({
               ...s,
-              [key]: { ...field, value: e.target.value, error: undefined },
+              [key]: { ...s[key], value: e.target.value, error: undefined },
             }));
           }}
         />

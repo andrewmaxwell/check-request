@@ -34,7 +34,7 @@ export default function App() {
         Check Request Form
       </Typography>
 
-      <RenderFields fields={state} setState={setState} />
+      <RenderFields fields={state} onChange={setState} />
 
       <Typography p={1}>
         Pressing &quot;Submit&quot; will create an email ready to be sent.

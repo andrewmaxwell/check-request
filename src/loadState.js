@@ -40,15 +40,16 @@ const fieldConfig = {
         formatter: dollarFormatter,
       },
     },
-    update: (_, node) => !node.value?.length && { value: [node.blankRow] },
+    update: (state) =>
+      !state.list.value?.length && { value: [state.list.blankRow] },
   },
   total: {
     label: "Total",
     type: "calculated",
     formatter: dollarFormatter,
-    update: (state, node) => {
+    update: (state) => {
       const value = sum(state.list.value?.map((row) => row.amount.value));
-      return value !== node.value && { value };
+      return value !== state.total.value && { value };
     },
   },
   checkDelivery: {
@@ -63,9 +64,9 @@ const fieldConfig = {
   address: {
     label: "Address",
     type: "text",
-    update: (state, node) => {
+    update: (state) => {
       const hide = state.checkDelivery.value !== "Mail Check";
-      return node.hide !== hide && { hide };
+      return state.address.hide !== hide && { hide };
     },
   },
 };
