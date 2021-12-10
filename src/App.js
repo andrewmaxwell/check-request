@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,18 +13,15 @@ import { runUpdaters } from "./runUpdaters.js";
 
 /* 
 Possible Future Features: 
-- Send to Ministry Leader for approval when total > $250
-
+- Send to respective ministry leaders for approval when total > $250
+- Store form configuration in a google spreadsheet
 */
 
 export default function App() {
-  const [state, setState] = useState();
+  const [fields, setFields] = useState();
 
-  useEffect(() => {
-    loadState().then(setState);
-  }, []);
-
-  if (!state) {
+  if (!fields) {
+    loadState().then(setFields);
     return (
       <Box sx={{ display: "flex", justifyContent: "center", padding: 20 }}>
         <CircularProgress size={100} />
@@ -32,7 +29,7 @@ export default function App() {
     );
   }
 
-  runUpdaters(state, setState);
+  runUpdaters(fields, setFields);
 
   return (
     <Container maxWidth="md">
@@ -40,7 +37,7 @@ export default function App() {
         Check Request Form
       </Typography>
 
-      <RenderFields fields={state} onChange={setState} />
+      <RenderFields fields={fields} onChange={setFields} />
 
       <Typography p={1}>
         Pressing &quot;Submit&quot; will create an email ready to be sent.
@@ -54,7 +51,7 @@ export default function App() {
       </Typography>
 
       <Box p={1}>
-        <Button variant="contained" onClick={() => submit(state, setState)}>
+        <Button variant="contained" onClick={() => submit(fields, setFields)}>
           Submit
         </Button>
       </Box>

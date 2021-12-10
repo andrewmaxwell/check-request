@@ -19,8 +19,8 @@ export const loadState = async () => ({
   },
   list: {
     label: "list",
-    type: "rows",
-    blankRow: {
+    type: "repeatingSection",
+    fields: {
       account: {
         label: "Account",
         type: "select",
@@ -41,7 +41,7 @@ export const loadState = async () => ({
       },
     },
     update: (state) =>
-      !state.list.value?.length && { value: [state.list.blankRow] },
+      !state.list.value?.length && { value: [state.list.fields] },
   },
   total: {
     label: "Total",

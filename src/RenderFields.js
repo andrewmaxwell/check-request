@@ -36,7 +36,7 @@ const fieldRenderers = {
     />
   ),
 
-  rows: ({ blankRow, value, onChange }) => (
+  repeatingSection: ({ fields, value, onChange }) => (
     <>
       {value.map((row, i) => (
         <Grid container item key={i} spacing={1}>
@@ -61,7 +61,7 @@ const fieldRenderers = {
       ))}
 
       <Button
-        onClick={() => onChange({ target: { value: [...value, blankRow] } })}
+        onClick={() => onChange({ target: { value: [...value, fields] } })}
       >
         Add Row
       </Button>
