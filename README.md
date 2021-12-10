@@ -12,7 +12,7 @@ I spent 25+ hours this past week writing, refining, and trimming down the code f
 - Can add and remove Account/Explanation/Amount rows.
 - If the Account/Explanation/Amount list is ever empty, it is replaced with a single blank row.
 - The Total field gets updated with the sum of the amounts.
-- The Address field is only visible when "Check Delivery" is set to "Mail Check"
+- The Address field is only visible when "Check Delivery" is set to "Mail Check".
 - Fields are validated when clicking submit.
 - If all fields are valid, an email is generated when clicking submit.
 
@@ -28,7 +28,7 @@ __loadState.js__: https://github.com/andrewmaxwell/check-request/blob/main/src/l
 - The order of the properties determine the order they appear. This isn't really best practice since property order isn't guaranteed, but it's been working fine so far in all of the browsers I've tested.
 
 __runUpdaters.js__: https://github.com/andrewmaxwell/check-request/blob/main/src/runUpdaters.js
-- Goes through the fields and runs their update functions. If an update function returns an - object, it gets merged into the field.
+- Goes through the fields and runs their update functions. If an update function returns an object, it gets merged into the field.
 
 __RenderFields.js__: https://github.com/andrewmaxwell/check-request/blob/main/src/RenderFields.js
 - Renders the fields from the field state and wires them up to be able to update field state when changed.
