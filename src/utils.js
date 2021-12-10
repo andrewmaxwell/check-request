@@ -12,21 +12,10 @@ export const remove = (index, arr) => {
 
 export const sum = (arr) => arr?.reduce((a, b) => a + (Number(b) || 0), 0);
 
-export const assocPath = ([first, ...rest], val, data) => {
-  const copy = Array.isArray(data) ? [...data] : { ...data };
-  copy[first] = rest.length ? assocPath(rest, val, data[first]) : val;
-  return copy;
-};
-
-export const objMap = (func, obj) => {
-  const res = {};
+export const map = (func, obj) => {
+  const res = Array.isArray(obj) ? [] : {};
   for (const key in obj) {
     res[key] = func(obj[key], key);
   }
   return res;
-};
-
-export const once = (func) => {
-  let cache;
-  return () => (cache === undefined ? (cache = func()) : cache);
 };

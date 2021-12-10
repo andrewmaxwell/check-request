@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Container,
+} from "@mui/material";
 import { RenderFields } from "./RenderFields.js";
 import { submit } from "./submit.js";
 import { loadState } from "./loadState.js";
@@ -29,7 +35,7 @@ export default function App() {
   runUpdaters(state, setState);
 
   return (
-    <>
+    <Container maxWidth="md">
       <Typography p={1} variant="h4">
         Check Request Form
       </Typography>
@@ -68,6 +74,6 @@ export default function App() {
       >
         Report a Problem
       </a>
-    </>
+    </Container>
   );
 }

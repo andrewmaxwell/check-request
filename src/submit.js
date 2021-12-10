@@ -1,26 +1,26 @@
-import { objMap } from "./utils";
+import { map } from "./utils";
 
 const isVisible = ({ hide }) => !hide;
 
 const isEmpty = (val = "") => !String(val).trim().length;
 
-const isInvalid = (node) =>
-  isVisible(node) &&
-  (isEmpty(node.value) ||
-    (Array.isArray(node.value) &&
-      node.value.some((row) => Object.values(row).some(isInvalid))));
+const isInvalid = (field) =>
+  isVisible(field) &&
+  (isEmpty(field.value) ||
+    (Array.isArray(field.value) &&
+      field.value.some((row) => Object.values(row).some(isInvalid))));
 
-const addValidationErrors = (arr) =>
-  objMap(
-    (node) =>
-      Array.isArray(node.value)
-        ? { ...node, value: node.value.map(addValidationErrors) }
-        : { ...node, error: isInvalid(node) && "Required" },
-    arr
+const addValidationErrors = (obj) =>
+  map(
+    (field) =>
+      Array.isArray(field.value)
+        ? { ...field, value: field.value.map(addValidationErrors) }
+        : { ...field, error: isInvalid(field) && "Required" },
+    obj
   );
 
-const fieldsToStr = (arr) =>
-  Object.values(arr)
+const fieldsToStr = (obj) =>
+  Object.values(obj)
     .filter(isVisible)
     .map(({ label, value, formatter = (x) => x }) =>
       Array.isArray(value)
