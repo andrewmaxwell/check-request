@@ -1,12 +1,13 @@
+## Live Demo: https://andrewmaxwell.github.io/check-request/
+
+## Why?
 I was asked by some other leaders at my church if I would like to come up with an electronic way to do reimbursement requests. I said yes and decided it would be fun to slightly over-engineer the thing. So I made the form renderer and state manager that I always wished DART had (my previous project at Bayer).
 
 We decided the simplest solution would be to collect the relevant information in a web form and send it via email. No server-side code, authentication, or consolidated storage of the requests is necessary.
 
 I spent 25+ hours this past week writing, refining, and trimming down the code for this thing, and I enjoyed every second of it.
 
-Live Demo: https://andrewmaxwell.github.io/check-request/
-
-Dynamic behaviors:
+## Dynamic behaviors:
 - The values for the Accounts selector come from an easily-maintained google spreadsheet.
 - Can add and remove Account/Explanation/Amount rows.
 - If the Account/Explanation/Amount list is ever empty, it is replaced with a single blank row.
@@ -15,6 +16,7 @@ Dynamic behaviors:
 - Fields are validated when clicking submit.
 - If all fields are valid, an email is generated when clicking submit.
 
+## The Code
 __App.js__: https://github.com/andrewmaxwell/check-request/blob/main/src/App.js
 - If there is no state, it shows a spinner and loads the state.
 - Once the state is loaded, it calls `runUpdaters` on every render and renders the form.
@@ -39,13 +41,13 @@ __submit.js__: https://github.com/andrewmaxwell/check-request/blob/main/src/subm
 
 
 
-For local development: 
+## For local development: 
 ```
 npm i
 npm start
 ```
 
-To deploy to Github Page:
+## To deploy to Github Page:
 ```
 npm run deploy
 ```
