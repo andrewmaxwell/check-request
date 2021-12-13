@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -20,8 +20,11 @@ Possible Future Features:
 export default function App() {
   const [fields, setFields] = useState();
 
-  if (!fields) {
+  useEffect(() => {
     loadState().then(setFields);
+  }, []);
+
+  if (!fields) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", padding: 20 }}>
         <CircularProgress size={100} />
