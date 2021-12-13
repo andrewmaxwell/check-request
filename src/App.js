@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -18,10 +18,19 @@ Possible Future Features:
 */
 
 export default function App() {
-  const [fields, setFields] = useState();
+  const [state, setState] = useState();
 
-  if (!fields) {
-    loadState().then(setFields);
+  useEffect(() => {
+    loadState().then(setState);
+  }, []);
+
+  const setFields = useCallback(
+    (updateFields) =>
+      setState((s) => ({ ...s, fields: updateFields(s.fields) })),
+    []
+  );
+
+  if (!state) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", padding: 20 }}>
         <CircularProgress size={100} />
@@ -29,36 +38,31 @@ export default function App() {
     );
   }
 
-  runUpdaters(fields, setFields);
+  runUpdaters(state.fields, setFields);
 
   return (
     <Container maxWidth="md">
       <Typography p={1} variant="h4">
-        Check Request Form
+        {state.formTitle}
       </Typography>
 
-      <RenderFields fields={fields} onChange={setFields} />
+      <RenderFields fields={state.fields} onChange={setFields} />
 
-      <Typography p={1}>
-        Pressing &quot;Submit&quot; will create an email ready to be sent.
-      </Typography>
-
-      <Typography p={1}>
-        <strong>
-          Please attach any necessary documents or receipts to the email before
-          sending.
-        </strong>
-      </Typography>
+      <Typography
+        p={1}
+        dangerouslySetInnerHTML={{ __html: state.beforeButtonHtml }}
+      ></Typography>
 
       <Box p={1}>
-        <Button variant="contained" onClick={() => submit(fields, setFields)}>
-          Submit
+        <Button variant="contained" onClick={() => submit(state, setFields)}>
+          {state.submitLabel}
         </Button>
       </Box>
 
-      <Typography p={1}>
-        When you have sent the email, you may close this page.
-      </Typography>
+      <Typography
+        p={1}
+        dangerouslySetInnerHTML={{ __html: state.afterButtonHtml }}
+      ></Typography>
 
       <a
         style={{

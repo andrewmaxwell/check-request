@@ -68,7 +68,7 @@ const fieldRenderers = {
     </>
   ),
 
-  calculated: ({ label, value, formatter = (x) => x }) => (
+  calculated: ({ label, value, formatter }) => (
     <Typography>
       <strong>
         {label}: {formatter(value)}

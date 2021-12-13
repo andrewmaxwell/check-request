@@ -10,8 +10,6 @@ export const remove = (index, arr) => {
   return copy;
 };
 
-export const sum = (arr) => arr?.reduce((a, b) => a + (Number(b) || 0), 0);
-
 export const map = (func, obj) => {
   const res = Array.isArray(obj) ? [] : {};
   for (const key in obj) {

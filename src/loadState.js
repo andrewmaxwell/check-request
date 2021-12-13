@@ -1,74 +1,37 @@
-import { sum } from "./utils";
+import { map } from "./utils";
+import XLSX from "xlsx";
 
-const dollarFormatter = (val) => "$" + Number(val).toLocaleString();
+const spreadSheetUrl =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8iE5hkwY6i8ikmnosyDuuB4Oy1vOUaUoAYjgNo-UjiDn-SBB87MULu1ONczsDeC1PUsGFUiugz5gJ/pub?output=xlsx";
 
-const getAccounts = async () => {
-  const response = await fetch(
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQBAv7s2hKsbFKPuv8qZ8z0rAgsE_5ZPwP8rGY527yIfMLjOs9Foy-Z4Tj54SFYti7I4QvTYnmQQIQa/pub?output=tsv"
-  );
-  const text = await response.text();
-  return text?.split("\n").map((r) => r.trim());
+const formatters = {
+  dollars: (val) => "$" + Number(val).toLocaleString(),
 };
 
-export const loadState = async () => ({
-  requestorName: { label: "Requestor Name", type: "text", columns: 6 },
-  makeCheckPayableTo: {
-    label: "Make Check Payable To",
-    type: "text",
-    columns: 6,
-  },
-  list: {
-    label: "list",
-    type: "repeatingSection",
-    fields: {
-      account: {
-        label: "Account",
-        type: "select",
-        columns: 4,
-        options: await getAccounts(),
-      },
-      explanation: {
-        label: "Explanation",
-        type: "text",
-        columns: 5,
-        props: { multiline: true },
-      },
-      amount: {
-        label: "Amount",
-        type: "number",
-        columns: 2,
-        formatter: dollarFormatter,
-      },
-    },
-    update: (state) =>
-      !state.list.value?.length && { value: [state.list.fields] },
-  },
-  total: {
-    label: "Total",
-    type: "calculated",
-    formatter: dollarFormatter,
-    update: (state) => {
-      const value = sum(state.list.value?.map((row) => row.amount.value));
-      return value !== state.total.value && { value };
-    },
-  },
-  checkDelivery: {
-    label: "Check Delivery",
-    type: "select",
-    columns: 6,
-    options: [
-      "Mail Check",
-      "Give Check to Requestor",
-      "Place Check in Requestor's Folder",
-    ],
-  },
-  address: {
-    label: "Address",
-    type: "text",
-    columns: 6,
-    update: (state) => {
-      const hide = state.checkDelivery.value !== "Mail Check";
-      return state.address.hide !== hide && { hide };
-    },
-  },
-});
+export const loadState = async () => {
+  const resp = await fetch(location.hash.slice(1) || spreadSheetUrl);
+  const data = map(
+    XLSX.utils.sheet_to_json,
+    XLSX.read(await resp.arrayBuffer()).Sheets
+  );
+
+  const fields = {};
+  for (const f of data.fields) {
+    const obj = {
+      label: f.label,
+      type: f.type,
+      columns: Number(f.columns) || 0,
+      update: f.update && new Function("fields", f.update),
+      fields: {},
+      ...(f.options ? new Function("data", f.options)(data) : {}),
+    };
+    obj.formatter = formatters[obj.format] || ((x) => x);
+    if (f.parentField) fields[f.parentField].fields[f.key] = obj;
+    else fields[f.key] = obj;
+  }
+
+  return {
+    ...Object.fromEntries(data.config.map((r) => [r.key, r.value])),
+    fields,
+  };
+};
