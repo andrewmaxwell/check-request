@@ -1,5 +1,6 @@
 import { map } from "./utils";
-import XLSX from "xlsx";
+
+const { XLSX } = window;
 
 const spreadSheetUrl =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqtLRKclmmHXDiJjAslERNMniAlL0VKDvvWrj7njfiEOLAyM_HAKP-pzPrErqA0T9N2-PvkrUTG9Zy/pub?output=xlsx";
