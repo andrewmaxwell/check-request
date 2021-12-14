@@ -36,7 +36,13 @@ const fieldRenderers = {
     />
   ),
 
-  repeatingSection: ({ fields, value, onChange }) => (
+  repeatingSection: ({
+    fields,
+    value,
+    onChange,
+    addLabel = "Add Row",
+    deleteLabel = "Delete",
+  }) => (
     <>
       {value.map((row, i) => (
         <Grid container item key={i} spacing={1}>
@@ -53,7 +59,7 @@ const fieldRenderers = {
                   onChange({ target: { value: remove(i, value) } })
                 }
               >
-                Delete
+                {deleteLabel || "Delete"}
               </Button>
             </Grid>
           </RenderFields>
@@ -63,7 +69,7 @@ const fieldRenderers = {
       <Button
         onClick={() => onChange({ target: { value: [...value, fields] } })}
       >
-        Add Row
+        {addLabel || "Add Row"}
       </Button>
     </>
   ),

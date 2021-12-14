@@ -50,11 +50,16 @@ The `config` sheet contains `key`/`value` pairs that are used in the form.
 The `fields` sheet has the field configuration. Each row is a field.
 - `key` is the internal name of the field. It is only important if the field affects dynamic behavior.
 - `label` is the visible name of the field.
-- `type` can be `text`, `number`, `select`, `repeatingSection`, or `calculated`
+- `type` can be: 
+  - `text` allows any text to be entered.
+  - `number` allows only numbers to be entered.
+  - `select` creates a drop-down. Use the `options` column to specify how to get the options.
+  - `calculated` creates a read-only field. Use the `update` column to specify how to calculate the value.
+  - `repeatingSection` allows child fields to be repeated. It provides "Add Row" and "Delete" buttons. The labels of these buttons can be customized in the `options` column.
 - `columns` defines the width of the field. `12` is full width. In repeating sections, `11` would be full width because the "Delete" button takes up 1 column.
 - `parentField` specifies the `key` of the `repeatingSection` that a field belongs to. It should be empty for top-level fields.
-- `format` specifies a formatter. Currently, only `dollars` is supported.
-- `options` can contain JavaScript that is executed at form initialization. It has access to a `data` object, which contains a key for each sheet in the configuration. The values are arrays of objects (similar to CSV).
+- `format` specifies a formatter. Currently, only `dollars` is supported. This formatter is applied on calculated fields and in the generated email, but not on inputs.
+- `options` can contain JavaScript that is executed at form initialization. It has access to a `data` object, which contains a key for each sheet in the configuration. The values are arrays of objects (similar to CSV). For `select` fields, it should return an `{options}` object that specifies the possible options. For `text` fields, it can return additional properties for the input, like `multiline`. For `repeatingSection`, you can specify labels for the Add and Delete buttons.
 - `update` can contain JavaScript that is executed continuously when the form is being filled out. It has access to the field state. If it returns an object, the object is merged into the field. It is important that it only return an object if it needs to be updated. Otherwise it will cause an infinite loop.
 
 
