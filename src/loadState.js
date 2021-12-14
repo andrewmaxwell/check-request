@@ -2,7 +2,7 @@ import { map } from "./utils";
 import XLSX from "xlsx";
 
 const spreadSheetUrl =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8iE5hkwY6i8ikmnosyDuuB4Oy1vOUaUoAYjgNo-UjiDn-SBB87MULu1ONczsDeC1PUsGFUiugz5gJ/pub?output=xlsx";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqtLRKclmmHXDiJjAslERNMniAlL0VKDvvWrj7njfiEOLAyM_HAKP-pzPrErqA0T9N2-PvkrUTG9Zy/pub?output=xlsx";
 
 const formatters = {
   dollars: (val) => "$" + Number(val).toLocaleString(),
