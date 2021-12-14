@@ -55,7 +55,7 @@ The `fields` sheet has the field configuration. Each row is a field.
 - `parentField` specifies the `key` of the `repeatingSection` that a field belongs to. It should be empty for top-level fields.
 - `format` specifies a formatter. Currently, only `dollars` is supported.
 - `options` can contain JavaScript that is executed at form initialization. It has access to a `data` object, which contains a key for each sheet in the configuration. The values are arrays of objects (similar to CSV).
-- `update` can contain JavaScript that is executed continuously when the form is being filled out. It has access to the field state. If it returns an object, the object is merged into the field.
+- `update` can contain JavaScript that is executed continuously when the form is being filled out. It has access to the field state. If it returns an object, the object is merged into the field. It is important that it only return an object if it needs to be updated. Otherwise it will cause an infinite loop.
 
 
 ## For local development: 
