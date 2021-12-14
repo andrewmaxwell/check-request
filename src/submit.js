@@ -22,24 +22,25 @@ const addValidationErrors = (obj) =>
 const fieldsToStr = (obj) =>
   Object.values(obj)
     .filter(isVisible)
-    .map(({ label, value, formatter = (x) => x }) =>
+    .map(({ label, value, formatter }) =>
       Array.isArray(value)
         ? `\r\n${value.map((row) => fieldsToStr(row)).join("\r\n\r\n")}\r\n`
         : `${label}: ${formatter(value)}`
     )
     .join("\r\n");
 
-export const submit = (state, setState) => {
-  if (Object.values(state).some(isInvalid)) {
-    setState(addValidationErrors);
+export const submit = (
+  { fields, emailReminder, emailTo, emailSubject },
+  setFields
+) => {
+  if (Object.values(fields).some(isInvalid)) {
+    setFields(addValidationErrors);
     return;
   }
   const date = new Date().toLocaleString();
-  const fieldStr = fieldsToStr(state);
+  const fieldStr = fieldsToStr(fields);
   const body = encodeURIComponent(
-    `Date: ${date}\r\n${fieldStr}\r\n\r\nREMINDER: Attach relevant files.`
+    `Date: ${date}\r\n${fieldStr}\r\n\r\n${emailReminder}`
   );
-  window.open(
-    `mailto:chatham.ap@gmail.com?cc=chathamit@chathambiblechurch.org&subject=Check Request&body=${body}`
-  );
+  window.open(`mailto:${emailTo}&subject=${emailSubject}&body=${body}`);
 };
