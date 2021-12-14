@@ -8,6 +8,12 @@ const formatters = {
   dollars: (val) => "$" + Number(val).toLocaleString(),
 };
 
+const makeFunction = (args, body) =>
+  new Function(
+    ...args,
+    `try{${body}}catch(e){console.error(\`Error in ${body})\`, e.message)}`
+  );
+
 export const loadState = async () => {
   const resp = await fetch(location.hash.slice(1) || spreadSheetUrl);
   const data = map(
@@ -15,17 +21,19 @@ export const loadState = async () => {
     XLSX.read(await resp.arrayBuffer()).Sheets
   );
 
+  console.log("unprocessed config", data);
+
   const fields = {};
   for (const f of data.fields) {
     const obj = {
       label: f.label,
       type: f.type,
       columns: Number(f.columns) || 0,
-      update: f.update && new Function("fields", f.update),
+      update: f.update && makeFunction(["fields"], f.update),
+      formatter: formatters[f.format] || ((x) => x),
       fields: {},
-      ...(f.options ? new Function("data", f.options)(data) : {}),
+      ...(f.options ? makeFunction(["data"], f.options)(data) : {}),
     };
-    obj.formatter = formatters[obj.format] || ((x) => x);
     if (f.parentField) fields[f.parentField].fields[f.key] = obj;
     else fields[f.key] = obj;
   }
